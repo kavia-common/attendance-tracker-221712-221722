@@ -4,6 +4,7 @@ from flask_smorest import Api
 
 from .routes.health import blp as health_blp
 from .routes.auth import blp as auth_blp
+from .routes.attendance import blp as attendance_blp
 from .services.firebase_client import initialize_firebase_app
 
 # Initialize Flask app and API docs
@@ -33,3 +34,4 @@ except Exception as e:
 api = Api(app, spec_kwargs={"info": {"description": "Backend for attendance tracker with Firebase Auth middleware."}})
 api.register_blueprint(health_blp)
 api.register_blueprint(auth_blp)
+api.register_blueprint(attendance_blp)
