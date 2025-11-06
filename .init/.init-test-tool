@@ -1,0 +1,4 @@
+{
+    "command": "pytest",
+    "working_directory": "/home/kavia/workspace/code-generation/attendance-tracker-221712-221722/firebase_functions"
+}
