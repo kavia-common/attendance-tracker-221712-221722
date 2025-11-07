@@ -1,11 +1,12 @@
 from flask_smorest import Blueprint
 from flask.views import MethodView
 
-# Use proper import_name (__name__) and remove unsupported description kwarg
-blp = Blueprint("Health Check", __name__, url_prefix="/")
+# Simple health blueprint mounted at root. Avoid spaces in blueprint name for cleaner docs/tagging.
+blp = Blueprint("Health", __name__, url_prefix="/")
 
-
+# PUBLIC_INTERFACE
 @blp.route("/")
 class HealthCheck(MethodView):
+    """Health check endpoint. Returns 200 with a simple JSON payload to signal readiness."""
     def get(self):
-        return {"message": "Healthy"}
+        return {"message": "Healthy"}, 200
