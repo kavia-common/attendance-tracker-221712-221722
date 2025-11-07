@@ -9,7 +9,13 @@ Backend (firebase_functions) quickstart:
 - Verify:
   - GET http://0.0.0.0:3001/ -> {"message":"Healthy"}
   - OpenAPI docs served under prefix configured by OPENAPI_URL_PREFIX (default /docs) via flask-smorest.
-  
+
+Startup resilience:
+- The app now loads .env if present (via python-dotenv) but does not fail if missing.
+- A minimal fallback health route is always registered at "/" so the container becomes ready even if flask-smorest fails to initialize.
+- Blueprints are registered via flask_smorest.Api when possible. If an AttributeError or version mismatch occurs, the app falls back to app.register_blueprint for stability.
+- The entrypoint binds to 0.0.0.0 on PORT (default 3001), with safe FLASK_ENV defaults, and without the reloader for containerized runs.
+
 Notes:
-- All blueprints use flask_smorest.Blueprint and are registered on a flask_smorest.Api instance to avoid AttributeError due to mixed blueprint types.
+- All blueprints use flask_smorest.Blueprint and are registered on a flask_smorest.Api instance to avoid AttributeError due to mixed blueprint types when available.
 - If you encounter a mismatch, ensure Flask==3.1.* and flask-smorest==0.45.* remain pinned in firebase_functions/requirements.txt.

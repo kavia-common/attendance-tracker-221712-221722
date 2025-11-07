@@ -9,7 +9,19 @@ It supports two modes of running:
 PUBLIC_INTERFACE
 """
 import os
-from app import app
+
+# Load .env if present, but never fail if missing
+try:
+    from dotenv import load_dotenv  # type: ignore
+    load_dotenv(override=False)
+except Exception:
+    pass
+
+# Safe default for FLASK_ENV if not provided
+os.environ.setdefault("FLASK_ENV", "production")
+
+from app import app  # noqa: E402
+
 
 def _get_host_port():
     """
@@ -25,7 +37,9 @@ def _get_host_port():
         port = 3001
     return host, port
 
+
 if __name__ == "__main__":
     host, port = _get_host_port()
     # Disable reloader in container environments to avoid double-start
-    app.run(host=host, port=port, debug=os.getenv("FLASK_DEBUG", "0") == "1", use_reloader=False)
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host=host, port=port, debug=debug, use_reloader=False)
