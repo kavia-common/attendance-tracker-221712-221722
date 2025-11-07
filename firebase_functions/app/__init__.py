@@ -35,6 +35,12 @@ def root_health():
     """Fallback health route to ensure container readiness even if extensions fail."""
     return jsonify({"message": "Healthy"}), 200
 
+# Mirror health endpoint for platforms that probe /healthz
+@app.get("/healthz")
+def healthz():
+    """Simple healthz endpoint mirroring root health for readiness probes."""
+    return jsonify({"message": "Healthy"}), 200
+
 # Load base config and OpenAPI/Swagger UI settings (used if smorest is available)
 app.config["API_TITLE"] = os.getenv("API_TITLE", "My Flask API")
 app.config["API_VERSION"] = os.getenv("API_VERSION", "v1")

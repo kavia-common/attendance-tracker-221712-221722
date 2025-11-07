@@ -8,7 +8,13 @@ Backend (firebase_functions) quickstart:
 - Run: python firebase_functions/run.py
 - Verify:
   - GET http://0.0.0.0:3001/ -> {"message":"Healthy"}
+  - GET http://0.0.0.0:3001/healthz -> {"message":"Healthy"}
   - OpenAPI docs served under prefix configured by OPENAPI_URL_PREFIX (default /docs) via flask-smorest.
+
+Port and readiness:
+- The app binds to host 0.0.0.0 and port taken from PORT environment variable if set (e.g., platform-provided 3010), otherwise defaults to 3001.
+- Any FLASK_RUN_HOST/FLASK_RUN_PORT settings are ignored by the entrypoint; do not rely on flask run. Use `python firebase_functions/run.py`.
+- Readiness endpoints available at "/" and "/healthz".
 
 Startup resilience:
 - The app now loads .env if present (via python-dotenv) but does not fail if missing.

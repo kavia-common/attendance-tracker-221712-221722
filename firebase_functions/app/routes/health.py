@@ -10,3 +10,10 @@ class HealthCheck(MethodView):
     """Health check endpoint. Returns 200 with a simple JSON payload to signal readiness."""
     def get(self):
         return {"message": "Healthy"}, 200
+
+# PUBLIC_INTERFACE
+@blp.route("/healthz")
+class Healthz(MethodView):
+    """Readiness probe endpoint mirroring root health. Returns 200 with a simple JSON payload."""
+    def get(self):
+        return {"message": "Healthy"}, 200

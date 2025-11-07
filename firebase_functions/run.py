@@ -27,18 +27,26 @@ def _get_host_port():
     """
     Determine host and port to bind to.
     Priority:
-      1. env PORT if present (single source of truth)
+      1. env PORT if present (single source of truth provided by platform)
       2. Fallback to 3001
-    Host always binds to 0.0.0.0 unless HOST is explicitly set.
+
+    Host always binds to 0.0.0.0 to be reachable from outside the container.
     """
-    # Prefer explicit HOST if provided; otherwise bind to all interfaces
-    host = os.getenv("HOST", "0.0.0.0")
+    # Always bind to all interfaces in containerized environments
+    host = "0.0.0.0"
+
     # Single source of truth: PORT env (platform may inject e.g., 3010)
     try:
         port_env = os.getenv("PORT")
         port = int(port_env) if port_env is not None else 3001
     except (TypeError, ValueError):
         port = 3001
+
+    # Clear potential Flask CLI variables to avoid confusion if someone invokes flask run
+    # This file uses app.run() directly, so these shouldn't matter, but clearing for safety.
+    os.environ.pop("FLASK_RUN_PORT", None)
+    os.environ.pop("FLASK_RUN_HOST", None)
+
     return host, port
 
 
