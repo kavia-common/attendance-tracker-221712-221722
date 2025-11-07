@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from functools import wraps
 from typing import Any, Dict, Optional, Tuple
 
-from flask import Blueprint, request, jsonify, g
+from flask import request, jsonify, g
+from flask_smorest import Blueprint
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
