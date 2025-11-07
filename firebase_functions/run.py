@@ -18,8 +18,8 @@ except Exception:
 # Safe default for FLASK_ENV if not provided
 os.environ.setdefault("FLASK_ENV", "production")
 
-# Import the Flask app without causing side effects; no app.run here to avoid duplicate binding
-from app import app  # noqa: E402
+# Import app factory to avoid duplicate binding and support import by other frameworks
+from app import create_app  # noqa: E402
 
 
 def _get_host_port():
@@ -48,6 +48,10 @@ def _get_host_port():
 if __name__ == "__main__":
     # Only run the development server when executed directly to prevent duplicate binding in certain runners.
     host, port = _get_host_port()
+
+    # Build the application via factory
+    app = create_app()
+
     # Explicit startup logging for observability
     try:
         import logging  # local import after LOG_LEVEL config in app.__init__

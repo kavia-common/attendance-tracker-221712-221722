@@ -1,12 +1,12 @@
 import json
 import os
-from app import app  # import your Flask app; api may not exist if smorest fallback engaged
+from app import create_app  # use factory to avoid import-time side effects
 
-openapi_spec = None
-try:
-    from app import api  # type: ignore  # api may be None
-except Exception:
-    api = None  # type: ignore
+# Build app to access config and potential smorest Api
+app = create_app()
+
+# Try to access the Api via attribute attached in factory
+api = getattr(app, "api", None)
 
 with app.app_context():
     if api is not None and getattr(api, "spec", None) is not None:
@@ -23,7 +23,13 @@ with app.app_context():
                         "responses": {"200": {"description": "Healthy"}},
                         "tags": ["Health"],
                     }
-                }
+                },
+                "/healthz": {
+                    "get": {
+                        "responses": {"200": {"description": "Healthy"}},
+                        "tags": ["Health"],
+                    }
+                },
             },
             "tags": [{"name": "Health", "description": ""}],
             "components": {},
