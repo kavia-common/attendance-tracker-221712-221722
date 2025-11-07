@@ -67,6 +67,47 @@ def create_app():
     app.config["OPENAPI_SWAGGER_UI_PATH"] = ""
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
+    # Expose a resilient OpenAPI JSON regardless of smorest availability
+    @app.get("/openapi.json")
+    def openapi_json():
+        """Serve OpenAPI specification JSON. Falls back to minimal spec if smorest is unavailable."""
+        try:
+            api = getattr(app, "api", None)
+            if api is not None and getattr(api, "spec", None) is not None:
+                return api.spec.to_dict(), 200
+        except Exception:
+            # ignore and fall back
+            pass
+        # Fallback minimal spec that documents health endpoints
+        return {
+            "openapi": app.config["OPENAPI_VERSION"],
+            "info": {"title": app.config["API_TITLE"], "version": app.config["API_VERSION"]},
+            "paths": {
+                "/": {"get": {"responses": {"200": {"description": "Healthy"}}, "tags": ["Health"]}},
+                "/healthz": {"get": {"responses": {"200": {"description": "Healthy"}}, "tags": ["Health"]}},
+            },
+            "tags": [{"name": "Health", "description": ""}],
+            "components": {},
+        }, 200
+
+    # Provide a minimal fallback for /docs when smorest UI is unavailable
+    @app.get("/docs")
+    def docs_fallback():
+        """Serve a minimal docs page or let smorest handle if registered."""
+        # If smorest registered UI under this path, it will take precedence; otherwise return minimal HTML
+        return (
+            "<!DOCTYPE html>"
+            "<html><head><title>API Docs</title></head>"
+            "<body>"
+            "<h1>API Documentation</h1>"
+            "<p>If the Swagger UI is not shown by flask-smorest, you can download the OpenAPI spec: "
+            '<a href="/openapi.json">/openapi.json</a></p>'
+            "<p>This instance serves Swagger UI from CDN when flask-smorest is active.</p>"
+            "</body></html>",
+            200,
+            {"Content-Type": "text/html; charset=utf-8"},
+        )
+
     # Enable CORS - allow all origins by default; customize via CORS_ORIGINS env if needed
     cors_origins = os.getenv("CORS_ORIGINS", "*")
     CORS(app, resources={r"/*": {"origins": cors_origins}})
