@@ -6,6 +6,7 @@ from flask_smorest import Api
 
 # Import routes
 from .routes.health import blp as health_blp
+from .auth import blp as auth_blp
 
 # Import DB helpers
 from .db import init_engine, init_session_factory, test_connection
@@ -37,6 +38,7 @@ api = Api(app)
 
 # Register blueprints
 api.register_blueprint(health_blp)
+api.register_blueprint(auth_blp)
 
 # Placeholder: register additional blueprints here as the app grows
 # from .routes.students import blp as students_blp
