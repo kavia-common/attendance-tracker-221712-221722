@@ -19,7 +19,6 @@ blp = Blueprint(
     "Auth",
     __name__,
     url_prefix="/auth",
-    description="Authentication routes for signup, login, and JWT issuance",
 )
 
 # Helpers and configurations

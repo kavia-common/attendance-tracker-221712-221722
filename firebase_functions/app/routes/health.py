@@ -1,7 +1,8 @@
 from flask_smorest import Blueprint
 from flask.views import MethodView
 
-blp = Blueprint("Healt Check", "health check", url_prefix="/", description="Health check route")
+# Use proper import_name (__name__) and remove unsupported description kwarg
+blp = Blueprint("Health Check", __name__, url_prefix="/")
 
 
 @blp.route("/")

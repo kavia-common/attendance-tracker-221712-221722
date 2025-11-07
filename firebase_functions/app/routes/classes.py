@@ -14,7 +14,6 @@ blp = Blueprint(
     "Classes",
     __name__,
     url_prefix="/classes",
-    description="Class management and session scheduling/enrollment routes",
 )
 
 # ---------------------------
