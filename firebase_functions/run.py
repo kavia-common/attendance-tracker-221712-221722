@@ -1,10 +1,8 @@
 """
 Application entrypoint for firebase_functions container.
 
-This file ensures the Flask app starts on 0.0.0.0:3001 so the container becomes healthy.
-It supports two modes of running:
-- Direct python execution: python run.py
-- Flask CLI with FLASK_APP=run.py (it will still bind correctly if FLASK_RUN_HOST/FLASK_RUN_PORT are set)
+This file ensures the Flask app starts on 0.0.0.0:PORT (default 3001) so the container becomes healthy.
+It supports direct python execution: `python firebase_functions/run.py`
 
 PUBLIC_INTERFACE
 """
@@ -20,6 +18,7 @@ except Exception:
 # Safe default for FLASK_ENV if not provided
 os.environ.setdefault("FLASK_ENV", "production")
 
+# Import the Flask app without causing side effects; no app.run here to avoid duplicate binding
 from app import app  # noqa: E402
 
 
@@ -32,10 +31,7 @@ def _get_host_port():
 
     Host always binds to 0.0.0.0 to be reachable from outside the container.
     """
-    # Always bind to all interfaces in containerized environments
     host = "0.0.0.0"
-
-    # Single source of truth: PORT env (platform may inject e.g., 3010)
     try:
         port_env = os.getenv("PORT")
         port = int(port_env) if port_env is not None else 3001
@@ -43,7 +39,6 @@ def _get_host_port():
         port = 3001
 
     # Clear potential Flask CLI variables to avoid confusion if someone invokes flask run
-    # This file uses app.run() directly, so these shouldn't matter, but clearing for safety.
     os.environ.pop("FLASK_RUN_PORT", None)
     os.environ.pop("FLASK_RUN_HOST", None)
 
@@ -51,11 +46,14 @@ def _get_host_port():
 
 
 if __name__ == "__main__":
+    # Only run the development server when executed directly to prevent duplicate binding in certain runners.
     host, port = _get_host_port()
     # Explicit startup logging for observability
     try:
         import logging  # local import after LOG_LEVEL config in app.__init__
-        logging.getLogger(__name__).info("Starting firebase_functions on %s:%s", host, port)
+        logger = logging.getLogger("startup")
+        logger.info("Resolved bind address host=%s port=%s", host, port)
+        logger.info("Environment PORT=%s FLASK_ENV=%s", os.getenv("PORT"), os.getenv("FLASK_ENV"))
     except Exception:
         pass
 

@@ -2,6 +2,7 @@ from flask_smorest import Blueprint
 from flask.views import MethodView
 
 # Simple health blueprint mounted at root. Avoid spaces in blueprint name for cleaner docs/tagging.
+# Note: Even if smorest registration fails elsewhere, app.__init__ registers plain Flask "/" and "/healthz" fallbacks.
 blp = Blueprint("Health", __name__, url_prefix="/")
 
 # PUBLIC_INTERFACE

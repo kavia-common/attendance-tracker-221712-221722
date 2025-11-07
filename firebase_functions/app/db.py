@@ -71,6 +71,7 @@ def init_engine(echo: bool = False, pool_pre_ping: bool = True, pool_size: int =
     db_url = _get_database_url()
     if not db_url:
         logging.warning("Database configuration missing. Set POSTGRES_URL or POSTGRES_HOST/PORT/DB/USER/PASSWORD.")
+        # Optional: Return None to allow app to start without DB; handlers will return 503 where needed.
         return None
 
     try:

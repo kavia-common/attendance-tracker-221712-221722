@@ -28,6 +28,14 @@ logging.basicConfig(
 # Initialize Flask app
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+# Log resolved runtime env early (without assuming run.py executed main)
+try:
+    _host = "0.0.0.0"
+    _port_env = os.getenv("PORT")
+    _port = int(_port_env) if _port_env is not None and _port_env.isdigit() else 3001
+    logging.getLogger("startup").info("App initialized. Intended bind host=%s port=%s (PORT=%s)", _host, _port, _port_env)
+except Exception:
+    pass
 
 # Minimal fallback health route to guarantee readiness even if smorest fails
 @app.get("/")

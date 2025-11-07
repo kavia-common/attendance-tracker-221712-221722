@@ -33,10 +33,13 @@ class JwtConfig:
     def from_env() -> "JwtConfig":
         """
         Load JWT config from environment variables.
-        Requires JWT_SECRET and TOKEN_EXP_MIN (default 60).
+
+        Note: JWT_SECRET is optional at import/startup time to avoid crashing readiness.
+        Endpoints that issue/verify tokens will raise a clear 500 if JWT_SECRET is missing.
         """
         secret = os.getenv("JWT_SECRET")
         if not secret:
+            # Do not fail at import-time; raise when a token operation is attempted
             raise RuntimeError("Missing JWT_SECRET environment variable.")
         exp = int(os.getenv("TOKEN_EXP_MIN", "60"))
         return JwtConfig(secret=secret, algo="HS256", exp_minutes=exp)
