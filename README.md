@@ -16,6 +16,7 @@ Port and readiness:
 - Startup logs explicitly show "App initialized..." and "Resolved bind address host=... port=..." for observability.
 - Any FLASK_RUN_HOST/FLASK_RUN_PORT settings are ignored by the entrypoint; do not rely on flask run. Use `python firebase_functions/run.py`.
 - Readiness endpoints available at "/" and "/healthz" always return 200, even if smorest fails.
+- IMPORTANT: Ensure the environment variable PORT matches the platform-assigned port (e.g., 3010). If the wrong port is used or already occupied, the app will fail to start with "Address already in use". Set PORT accordingly before starting: `PORT=3010 python firebase_functions/run.py`.
 
 Startup resilience:
 - The app loads .env if present (via python-dotenv) but does not fail if missing.
