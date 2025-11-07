@@ -12,8 +12,16 @@ except Exception:
     pass
 
 # Configure basic logging format early
+def _resolve_log_level(value: str) -> int:
+    """Resolve LOG_LEVEL from env which may be provided as lower-case string."""
+    if isinstance(value, str):
+        return getattr(logging, value.upper(), logging.INFO)
+    if isinstance(value, int):
+        return value
+    return logging.INFO
+
 logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
+    level=_resolve_log_level(os.getenv("LOG_LEVEL", "INFO")),
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 
